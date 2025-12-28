@@ -19,27 +19,32 @@
             font-family: Arial, sans-serif;
             color: white;
             text-align: center;
+            transition: background 0.4s, color 0.4s;
+        }
+
+        .light {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: black;
         }
 
         .container {
             background: rgba(0, 0, 0, 0.45);
             padding: 45px;
             border-radius: 20px;
-            max-width: 650px;
+            max-width: 700px;
             width: 90%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             animation: fadeIn 1.2s ease-in-out;
         }
 
+        .light .container {
+            background: rgba(255,255,255,0.85);
+            color: black;
+        }
+
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         img {
@@ -58,12 +63,16 @@
 
         .subtitle {
             opacity: 0.9;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
 
         h2 {
             margin-top: 35px;
             color: #ffd369;
+        }
+
+        .light h2 {
+            color: #6c63ff;
         }
 
         ul {
@@ -84,18 +93,38 @@
 
         .btn {
             display: inline-block;
-            margin-top: 25px;
+            margin: 10px 5px;
             padding: 10px 25px;
             border-radius: 25px;
             background: #ffd369;
             color: black;
             text-decoration: none;
             font-weight: bold;
+            cursor: pointer;
             transition: transform 0.2s;
+            border: none;
         }
 
         .btn:hover {
             transform: scale(1.05);
+        }
+
+        input, textarea {
+            width: 90%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            img {
+                width: 120px;
+                height: 120px;
+            }
         }
     </style>
 </head>
@@ -104,11 +133,15 @@
 
 <div class="container">
 
+    <!-- Mode sombre -->
+    <button id="themeToggle" class="btn">🌙 Mode sombre</button>
+
     <!-- Photo -->
     <img src="photo.png" alt="Photo de Ethan Leglise">
 
     <h1>ETHAN LEGLISE</h1>
     <p class="subtitle">Étudiant en informatique • Développement web & bases en Go</p>
+    <p id="counter"></p>
 
     <h2><i class="fa-solid fa-code"></i> Compétences</h2>
     <ul>
@@ -119,25 +152,83 @@
 
     <h2><i class="fa-solid fa-folder-open"></i> Projets</h2>
 
-    <div class="project">
-        <h3>Serveur Minecraft</h3>
-        <p>Création et gestion d’un serveur multijoueur (2022).</p>
+    <!-- Filtres -->
+    <div>
+        <button class="btn filter" data-filter="all">Tous</button>
+        <button class="btn filter" data-filter="web">Web</button>
+        <button class="btn filter" data-filter="game">Jeux</button>
     </div>
 
-    <div class="project">
+    <div class="project" data-category="game">
+        <h3>Serveur Minecraft</h3>
+        <p>Création et gestion d’un serveur multijoueur.</p>
+    </div>
+
+    <div class="project" data-category="web">
         <h3>Puissance 4 Web</h3>
-        <p>Jeu développé en HTML, CSS et JavaScript (2025).</p>
+        <p>Jeu développé en HTML, CSS et JavaScript.</p>
     </div>
 
     <h2><i class="fa-solid fa-envelope"></i> Contact</h2>
-    <p>Email : ethanleglise33@gmail.com</p>
 
-   <a href="https://github.com/ethanleglise33-commits"
-   target="_blank"
-   class="btn">
-   <i class="fa-brands fa-github"></i> Mon GitHub
-</a>
+    <form id="contactForm">
+        <input type="text" id="name" placeholder="Nom" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <textarea id="message" placeholder="Message" required></textarea>
+        <button class="btn" type="submit">Envoyer</button>
+        <p id="formMsg"></p>
+    </form>
+
+    <h2>🎮 CV Gamifié</h2>
+    <p>Niveau développeur : <span id="level">1</span></p>
+    <button class="btn" onclick="gainXP()">Gagner de l'XP</button>
+
+    <br><br>
+
+    <a href="https://github.com/ethanleglise33-commits" target="_blank" class="btn">
+        <i class="fa-brands fa-github"></i> Mon GitHub
+    </a>
+
 </div>
+
+<script>
+    // 🌙 Mode sombre / clair
+    const toggle = document.getElementById("themeToggle");
+    toggle.addEventListener("click", () => {
+        document.body.classList.toggle("light");
+    });
+
+    // 👀 Compteur de visites
+    let visits = localStorage.getItem("visits") || 0;
+    visits++;
+    localStorage.setItem("visits", visits);
+    document.getElementById("counter").textContent = "Visites : " + visits;
+
+    // 📂 Filtrage projets
+    document.querySelectorAll(".filter").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const filter = btn.dataset.filter;
+            document.querySelectorAll(".project").forEach(p => {
+                p.style.display =
+                    filter === "all" || p.dataset.category === filter
+                    ? "block" : "none";
+            });
+        });
+    });
+
+    // ✉️ Validation formulaire
+    document.getElementById("contactForm").addEventListener("submit", e => {
+        e.preventDefault();
+        document.getElementById("formMsg").textContent = "Message envoyé ✅";
+    });
+
+    // 🎮 CV Gamifié
+    let level = 1;
+    function gainXP() {
+        level++;
+        document.getElementById("level").textContent = level;
+    }
+</script>
 
 </body>
 </html>
